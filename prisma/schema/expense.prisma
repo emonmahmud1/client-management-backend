@@ -1,0 +1,30 @@
+model Expense {
+  id            String    @id @default(uuid())
+  userId        String
+  title         String
+  category      ExpenseCategory // Matches frontend categories
+  amount        Float
+  date          DateTime
+  paymentMethod PaymentMethod   // Reuses PaymentMethod enum from invoice.prisma
+  status        ExpenseStatus @default(PAID) // Matches "paid" | "pending"
+
+  user          User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+enum ExpenseCategory {
+  MARKETING
+  OPERATIONS
+  LOGISTICS
+  SALARY
+  UTILITIES
+}
+
+enum ExpenseStatus {
+  PAID
+  PENDING
+}

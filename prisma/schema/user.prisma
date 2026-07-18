@@ -1,0 +1,32 @@
+model User {
+    userId    String   @id @default(uuid())
+    email     String   @unique
+    password  String
+    name      String
+    role      Role     @default(USER)
+    status    Status   @default(TRIAL)
+    updatedAt DateTime @updatedAt
+    createAt  DateTime @default(now())
+
+    googleAuth        Boolean   @default(false)
+    language          String?
+    profileImage      String?
+    operationsRole    String?
+    phone             String?
+    address           String?
+    country           String?
+    otp               Int?
+    isVerified        Boolean   @default(false)
+    refreshToken      String?
+    resetToken        String?
+    resetTokenExpires DateTime?
+
+    clients           Client[]
+    invoices          Invoice[]
+    expenses          Expense[]
+    payments          Payment[]
+
+    @@index([operationsRole])
+    @@index([name])
+    @@index([googleAuth])
+}

@@ -1,0 +1,59 @@
+model Invoice {
+  id            String    @id @default(uuid())
+  userId        String
+  clientId      String
+  invoiceNumber String    @unique // e.g., INV-100001
+  note          String?
+  status        InvoiceStatus @default(DUE) // Matches frontend "paid" | "due" | "overdue"
+  dueDate       DateTime?
+  
+  // Relations
+  user          User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  client        Client    @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  items         InvoiceItem[]
+  payments      Payment[] // Payments applied to this specific invoice
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([clientId])
+}
+
+model InvoiceItem {
+  id            String    @id @default(uuid())
+  invoiceId     String
+  name          String
+  quantity      Int
+  price         Float     
+
+  invoice       Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id            String    @id @default(uuid())
+  userId        String
+  clientId      String
+  invoiceId     String?   // Optional: A payment might just be added to client account balance
+  amount        Float
+  date          DateTime
+  method        PaymentMethod // Matches frontend "Cash" | "bKash" | "Bank"
+  
+  user          User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  client        Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  invoice       Invoice?  @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime  @default(now())
+}
+
+enum InvoiceStatus {
+  PAID
+  DUE
+  OVERDUE
+}
+
+enum PaymentMethod {
+  CASH
+  BKASH
+  BANK
+}

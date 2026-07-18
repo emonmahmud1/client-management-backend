@@ -1,0 +1,25 @@
+model Client {
+  id             String    @id @default(uuid())
+  userId         String    // Links to User for multi-tenancy
+  name           String
+  company        String?
+  phone          String
+  email          String?
+  address        String?
+  status         ClientStatus @default(ACTIVE)
+  
+  // Relations
+  user           User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  invoices       Invoice[]
+  payments       Payment[] // Tracks payments made by this client
+  
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+enum ClientStatus {
+  ACTIVE
+  OVERDUE
+}
