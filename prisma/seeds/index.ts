@@ -1,4 +1,4 @@
-import { PrismaClient, AdminRole } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import pg from 'pg';
 import * as bcrypt from 'bcrypt';
@@ -10,27 +10,29 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   console.log('🌱 Seeding database...');
 
-  const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || 'superadmin@example.com';
-  const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD || 'password123';
+  const superAdminEmail = process.env.SUPER_ADMIN_EMAIL || 'superadmin@gmail.com';
+  const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD || 'superadmin';
   const hashedPassword = await bcrypt.hash(superAdminPassword, 10);
 
-  // Create Super Admin if it doesn't exist
-  const existingSuperAdmin = await prisma.admin.findFirst({
-    where: { role: AdminRole.SUPER_ADMIN },
+  // Create Super Admin User if it doesn't exist
+  const existingSuperAdmin = await prisma.user.findFirst({
+    where: { role: Role.SUPER_ADMIN },
   });
 
   if (!existingSuperAdmin) {
-    const superAdmin = await prisma.admin.create({
+    const superAdmin = await prisma.user.create({
       data: {
         email: superAdminEmail,
         password: hashedPassword,
         name: 'Super Admin',
-        role: AdminRole.SUPER_ADMIN,
+        role: Role.SUPER_ADMIN,
+        status: 'ACTIVE',
+        isVerified: true
       },
     });
-    console.log(`Created super admin: ${superAdmin.email}`);
+    console.log(`Created super admin user: ${superAdmin.email}`);
   } else {
-    console.log('Super admin already exists, skipping seed.');
+    console.log('Super admin user already exists, skipping seed.');
   }
 
   console.log('✅ Seeding complete!');

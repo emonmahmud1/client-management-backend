@@ -47,13 +47,13 @@ model Payment {
 }
 
 enum InvoiceStatus {
-  PAID
-  DUE
-  OVERDUE
+  PAID @map("paid")
+  DUE @map("due")
+  OVERDUE @map("overdue")
 }
 
 enum PaymentMethod {
-  CASH
-  BKASH
-  BANK
+  CASH @map("Cash")
+  BKASH @map("bKash")
+  BANK @map("Bank")
 }

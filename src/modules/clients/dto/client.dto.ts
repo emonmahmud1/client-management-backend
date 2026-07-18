@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { ClientStatus } from '@prisma/client';
 
 export class CreateClientDto {
@@ -7,24 +7,21 @@ export class CreateClientDto {
   @IsString()
   name: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsString()
-  @IsOptional()
-  company?: string;
+  company: string;
 
   @ApiProperty()
   @IsString()
   phone: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsEmail()
-  @IsOptional()
-  email?: string;
+  email: string;
 
-  @ApiPropertyOptional()
+  @ApiProperty()
   @IsString()
-  @IsOptional()
-  address?: string;
+  address: string;
 
   @ApiPropertyOptional({ enum: ClientStatus })
   @IsEnum(ClientStatus)
@@ -32,4 +29,4 @@ export class CreateClientDto {
   status?: ClientStatus;
 }
 
-export class UpdateClientDto extends CreateClientDto {}
+export class UpdateClientDto extends PartialType(CreateClientDto) {}

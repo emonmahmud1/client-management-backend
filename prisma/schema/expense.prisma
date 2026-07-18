@@ -17,14 +17,14 @@ model Expense {
 }
 
 enum ExpenseCategory {
-  MARKETING
-  OPERATIONS
-  LOGISTICS
-  SALARY
-  UTILITIES
+  MARKETING @map("Marketing")
+  OPERATIONS @map("Operations")
+  LOGISTICS @map("Logistics")
+  SALARY @map("Salary")
+  UTILITIES @map("Utilities")
 }
 
 enum ExpenseStatus {
-  PAID
-  PENDING
+  PAID @map("paid")
+  PENDING @map("pending")
 }

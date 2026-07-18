@@ -7,6 +7,7 @@ import {
   ForgotPasswordDto,
   ResetPasswordDto,
   VerificationDto,
+  RefreshTokenDto,
 } from './dto/auth.dto';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -39,9 +40,9 @@ export class AuthController {
   @Public()
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token' })
-  refresh(@Body('refreshToken') refreshToken: string) {
-    if (!refreshToken) throw new UnauthorizedException('Refresh token missing');
-    return this.authService.refresh(refreshToken);
+  refresh(@Body() refreshTokenDto: RefreshTokenDto) {
+    if (!refreshTokenDto.refreshToken) throw new UnauthorizedException('Refresh token missing');
+    return this.authService.refresh(refreshTokenDto.refreshToken);
   }
 
   @Public()

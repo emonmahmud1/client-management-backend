@@ -2,10 +2,10 @@ model Client {
   id             String    @id @default(uuid())
   userId         String    // Links to User for multi-tenancy
   name           String
-  company        String?
+  company        String
   phone          String
-  email          String?
-  address        String?
+  email          String
+  address        String
   status         ClientStatus @default(ACTIVE)
   
   // Relations
@@ -20,6 +20,6 @@ model Client {
 }
 
 enum ClientStatus {
-  ACTIVE
-  OVERDUE
+  ACTIVE @map("active")
+  OVERDUE @map("overdue")
 }
