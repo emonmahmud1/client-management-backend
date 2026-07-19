@@ -91,7 +91,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.generateTokens(user.userId || user.adminId, user.email, role);
+    return this.generateTokens(user.userId || user.adminId, user.email, role, user.name || user.email);
   }
 
   async refresh(refreshToken: string) {
@@ -151,7 +151,7 @@ export class AuthService {
     return { message: 'Password reset successful' };
   }
 
-  private async generateTokens(userId: string, email: string, role: string) {
+  private async generateTokens(userId: string, email: string, role: string, name?: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         { sub: userId, email, role },
@@ -169,11 +169,22 @@ export class AuthService {
       ),
     ]);
 
-    await this.usersService.update(userId, { refreshToken });
+    // Only update refreshToken for regular users (not admins)
+    try {
+      await this.usersService.update(userId, { refreshToken });
+    } catch (e) {
+      // Admin users won't have a user record — ignore
+    }
 
     return {
       accessToken,
       refreshToken,
+      user: {
+        id: userId,
+        email,
+        role,
+        name: name || email,
+      },
     };
   }
 }

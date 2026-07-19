@@ -14,30 +14,30 @@ export class ExpensesController {
   @Post()
   @ApiOperation({ summary: 'Create a new expense' })
   create(@Req() req: any, @Body() createExpenseDto: CreateExpenseDto) {
-    return this.expensesService.create(req.user.userId, createExpenseDto);
+    return this.expensesService.create(req.user.sub, createExpenseDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all expenses' })
   findAll(@Req() req: any) {
-    return this.expensesService.findAll(req.user.userId);
+    return this.expensesService.findAll(req.user.sub);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get specific expense by ID' })
   findOne(@Req() req: any, @Param('id') id: string) {
-    return this.expensesService.findOne(req.user.userId, id);
+    return this.expensesService.findOne(req.user.sub, id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update an expense' })
   update(@Req() req: any, @Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
-    return this.expensesService.update(req.user.userId, id, updateExpenseDto);
+    return this.expensesService.update(req.user.sub, id, updateExpenseDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete an expense' })
   remove(@Req() req: any, @Param('id') id: string) {
-    return this.expensesService.remove(req.user.userId, id);
+    return this.expensesService.remove(req.user.sub, id);
   }
 }

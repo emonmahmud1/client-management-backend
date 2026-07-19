@@ -17,7 +17,11 @@ async function bootstrap() {
 
   // Global settings
   app.setGlobalPrefix(apiPrefix);
-  app.enableCors();
+  app.enableCors({
+    origin: true, // Allow all origins for dev, or specify ['http://localhost:3000']
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalInterceptors(new TransformInterceptor());

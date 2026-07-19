@@ -14,30 +14,30 @@ export class InvoicesController {
   @Post()
   @ApiOperation({ summary: 'Create a new invoice with items' })
   create(@Req() req: any, @Body() createInvoiceDto: CreateInvoiceDto) {
-    return this.invoicesService.create(req.user.userId, createInvoiceDto);
+    return this.invoicesService.create(req.user.sub, createInvoiceDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Get all invoices' })
   findAll(@Req() req: any) {
-    return this.invoicesService.findAll(req.user.userId);
+    return this.invoicesService.findAll(req.user.sub);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get specific invoice by ID' })
   findOne(@Req() req: any, @Param('id') id: string) {
-    return this.invoicesService.findOne(req.user.userId, id);
+    return this.invoicesService.findOne(req.user.sub, id);
   }
 
   @Post('payments')
   @ApiOperation({ summary: 'Record a payment against a client or invoice' })
   createPayment(@Req() req: any, @Body() createPaymentDto: CreatePaymentDto) {
-    return this.invoicesService.createPayment(req.user.userId, createPaymentDto);
+    return this.invoicesService.createPayment(req.user.sub, createPaymentDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete an invoice' })
   remove(@Req() req: any, @Param('id') id: string) {
-    return this.invoicesService.remove(req.user.userId, id);
+    return this.invoicesService.remove(req.user.sub, id);
   }
 }

@@ -20,7 +20,6 @@ export class DashboardService {
     });
 
     // Outstanding Dues (Total Invoice amounts minus Total Payments)
-    // To do this accurately, we can get all invoices and their items
     const invoices = await this.prisma.invoice.findMany({
       where: { userId },
       include: { items: true }
@@ -63,5 +62,71 @@ export class DashboardService {
       category: t.category,
       amount: t._sum.amount || 0
     }));
+  }
+
+  async getMonthlyFinanceData(userId: string) {
+    // Simplified logic: group payments and expenses by month (for the current year)
+    const currentYear = new Date().getFullYear();
+    const startDate = new Date(`${currentYear}-01-01`);
+
+    const payments = await this.prisma.payment.findMany({
+      where: { userId, date: { gte: startDate } }
+    });
+
+    const expenses = await this.prisma.expense.findMany({
+      where: { userId, status: ExpenseStatus.PAID, date: { gte: startDate } }
+    });
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthlyData = months.map(month => ({ month, income: 0, expense: 0 }));
+
+    payments.forEach(p => {
+      const monthIndex = p.date.getMonth();
+      monthlyData[monthIndex].income += p.amount;
+    });
+
+    expenses.forEach(e => {
+      const monthIndex = e.date.getMonth();
+      monthlyData[monthIndex].expense += e.amount;
+    });
+
+    // Return only up to current month to match charts
+    const currentMonthIndex = new Date().getMonth();
+    return monthlyData.slice(0, currentMonthIndex + 1);
+  }
+
+  async getRecentOverdueInvoices(userId: string) {
+    const invoices = await this.prisma.invoice.findMany({
+      where: { userId, status: InvoiceStatus.OVERDUE },
+      include: { client: true, items: true },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    });
+
+    return invoices.map(inv => {
+      const totalAmount = inv.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+      return {
+        id: inv.id,
+        invoiceNumber: inv.invoiceNumber,
+        clientName: inv.client.name,
+        amount: totalAmount,
+        dueDate: inv.dueDate ? inv.dueDate.toISOString().split('T')[0] : null,
+        daysOverdue: inv.dueDate ? Math.floor((Date.now() - inv.dueDate.getTime()) / (1000 * 3600 * 24)) : 0
+      };
+    });
+  }
+
+  async getRecentClients(userId: string) {
+    return this.prisma.client.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        createdAt: true,
+      }
+    });
   }
 }
