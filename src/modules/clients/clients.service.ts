@@ -4,7 +4,7 @@ import { CreateClientDto, UpdateClientDto } from './dto/client.dto';
 
 @Injectable()
 export class ClientsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(userId: string, createClientDto: CreateClientDto) {
     return this.prisma.client.create({
@@ -34,7 +34,10 @@ export class ClientsService {
       }, 0);
 
       const totalPaid = client.payments.reduce((sum, payment) => sum + payment.amount, 0);
-      const outstandingDue = totalPurchase - totalPaid;
+      let outstandingDue = totalPurchase - totalPaid;
+      
+      // Fix floating point issues
+      outstandingDue = Math.round(outstandingDue * 100) / 100;
 
       // Clean up response by removing the bulky included relations
       const { invoices, payments, ...clientData } = client;
@@ -62,12 +65,17 @@ export class ClientsService {
       return sum + inv.items.reduce((itemSum, item) => itemSum + (item.quantity * item.price), 0);
     }, 0);
     const totalPaid = client.payments.reduce((sum, payment) => sum + payment.amount, 0);
-    const outstandingDue = totalPurchase - totalPaid;
+    let outstandingDue = totalPurchase - totalPaid;
+    
+    // Fix floating point issues
+    outstandingDue = Math.round(outstandingDue * 100) / 100;
 
     const { invoices, payments, ...clientData } = client;
 
     return {
       ...clientData,
+      invoices: invoices || [],
+      payments: payments || [],
       totalPurchase,
       outstandingDue: outstandingDue > 0 ? outstandingDue : 0,
     };

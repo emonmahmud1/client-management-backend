@@ -18,7 +18,7 @@ async function bootstrap() {
   // Global settings
   app.setGlobalPrefix(apiPrefix);
   app.enableCors({
-    origin: true, // Allow all origins for dev, or specify ['http://localhost:3000']
+    origin: ['http://localhost:3000', 'https://client-management-front-end-ecru.vercel.app'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
